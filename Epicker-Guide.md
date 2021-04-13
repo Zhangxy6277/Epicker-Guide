@@ -1,19 +1,19 @@
 # EPicker Guide
 
 ---
->Last editted by Tianfang, 2021.4.12
+>Last editted by Tianfang, 2021.4.13
 
 ## Overview
 
-### What is EPicker?
+### What is EPicker
 
 EPicker is a standalone software for particle picking in cryo-EM. It is implemented based on CenterNet, an open-source deep learning detection framework. Trained and well tested on datasets containing heterogenous particles, EPicker is able to pick particles, vesicles and filaments effectively. Different from other particle picking tools, EPicker builds up a continual learning mechanism. A previously unseen type of particles can be well learnt after trained with a small dataset of old particles, yielding a new model able to recognize both new particles and old ones. With this advantage, you can continually upgrade your model and save a lot of storage for model saving and data saving used for traditional retraining procedures.
 
 ### About this guide
 
-This user guide includes all instructions you may need for installation, picking and training. A tutorial is also provided at the end of this guide to help you walk through the complete workflow of EPicker. If you have any questions or if anything does not work, please contact me: ***zhaotianfang2010@163.com***
+This user guide includes all instructions you may need for installation, picking and training. A tutorial is also provided at the end of this guide to help you walk through the complete workflow of EPicker. If you have any questions or if anything goes wrong, please contact me at ***zhaotianfang2010@163.com***
 
-## Installation
+## Download and Installation
 
 ### Requirements
 
@@ -24,7 +24,7 @@ A GPU is essential to run a deep learning program. We have tested EPicker on fol
 - NVIDIA RTX 2080Ti  
 - NVIDIA Tesla P100  
 - NVIDIA Tesla A100  
-- NVIDIA Titan X 
+- NVIDIA Titan X
 
 #### System
 
@@ -73,23 +73,25 @@ If your default g++ version is below 5.0, you can simply specify a g++ path for 
 
 ## Picking
 
-### Command
+### Picking command
 
 Picking script is in Epicker/Epicker/bin/
 >$cd Epicker/Epicker/bin/  
 
 >$./epicker.sh {Parameters}
-###Essential Parameters
-Set your input and ouput path, select your model and switch to a working mode with these parameters.
+
+### Essential Parameters
+
+Set your input and ouput path, select your model and switch to a working mode using these essential parameters.
 
 - **data** Micrographs to be picked, which can be a mrc file, a path to mrc files or a thi file. For information of THI file, please refer to [THI file](#thi).
 - **load_model** Pretrained model. Three general models for picking particles, liposomes and filaments are available at [EPicker models]().
-- **mode** (default=particle) Picking mode: particle, vesicle or fiber. 
+- **mode** (default=particle) Picking mode: particle, vesicle or fiber.
 - **output** Folder of output coordinate files.
 
 ### Optional parameters
 
-These parameters are also useful and may influence your final picking results. We recommend you changing them to fit your own picking job, though they all have default values/tags. If you find puzzling in adjusting them, please refer to those notes after each parameter.
+These parameters are also useful and may influence your final picking results. You may change them to fit your own picking jobs, though they all have default values/tags. If you find puzzling in choosing a proper set of parameters, please refer to those notes after each parameter.
 
 - **K** (default=2000) Max particles to pick in each micrograph.
   
@@ -103,18 +105,81 @@ These parameters are also useful and may influence your final picking results. W
   
 >Usually those particles lying at the edge cannot be use for reconstruction, and this parameter help with ignoring those marginal particles. Notice that this value refers to a distance on a downsampled micrograph whose width(x-axis) has been downscaled to 1024.
 
-- **min_distance** (default=0)
+- **min_distance** (default=0) Minimum difference between two particles.
+
+>In most cases, you do not need to set this value. If you find multiple boxes are addressed to only one particle, you may use a bigger min_distance.
   
-- **visual**
+- **visual** EPicker will visualize its picking results and save them in PNG format to your disk if you add **--visual** to your command.
   
-- **output_type** (default=thi)
-  
+- **output_type** (default=thi) Which format of coordinate file you want to save. By now, for liposomes and filaments, we only support THI format. For single-particle jobs, you can switch to star, box, coord at your convinience.
+
+- **gpus** (default=0) Which gpu to use.
+
+> EPicker does not support picking using multiple gpus.
+
 ## Training
 
-### Parameters
+You can train your model use your own data and annotations. [Continual training](#continual_training) requires some addtional parameters than training from scratch.
+
+### Training command
+
+Training script is in Epicker/Epicker/bin/
+>$cd Epicker/Epicker/bin/  
+
+>$./epicker_train.sh {Parameters}
+
+### Essential parameters(training)
+
+Set your path to data and labels, choose your label format and working mode and name your job using these essential parameters.
+
+- **data** Image list(.thi) or a folder that contains micrographs used for training.
+
+- **label** Path to coordinate files.
+
+- **label_type** (default=thi) Format of your label files, thi/star/box/coord.
+
+- **exp_id** The output model will be saved in **exp_id** as model_last.pth.
+
+- **mode** (default=particle) Training mode: particle, vesicle or fiber.
+
+### Optional parameters(training)
+
+These parameters allow you to adjust your training procedure. Usually, you don't have to change the default settings unless you meet problems. If you find puzzling in choosing a proper set of parameters, please refer to those notes after each parameter.
+
+- **load_model** You can load an old model by adding **--load_model XXX.pth** to your command.
+
+> If you are training a model from scratch, just ignore this parameter. If you're finetuning a model or training in a continual manner, it helps you initialize your new model using old weights.
+
+-**lr** (default=1e-4) Learning rate, the stepsize of gradient descent.
+
+> Empirically, you dont't need to change it.
+
+-**batch_size** (default=4) Batchsize, number of images in a mini-batch.
+
+> Batchsize should not exceed your GPU memory. For example, if you're using a Tesla P100, you can set **batch_size=4**. If you have 4 Tesla P100 GPUs, set **batch_size=16**.
+
+- **num_epoch** (default=140) Total epochs for training.
+
+- **train_pct** (default=80) Percentage of data used for training.
+
+- **test_pct** (default=20) Percentage of data used for testing.
+
+> EPicker has a testing module based on COCOAPI, with which you can quickly compute your precision, recall and draw a PR-curve.
+
+- **gpus** (default=0) Specify which gpus you would like to run your training jobs on. GPU ids should be divided with comma like **--gpus 0,1,2,3**, if you want to train on the first 4 gpus of your machine.
+
+> Training on multiple gpus will be faster than training on only one. However, training on multiple gpus will cause a slight decay in performance. Yet we haven't come up with a solution to it. **So we recommend you to use just one gpu.**
+
+- **sparse_anno** If your annotations are sparse, add **--sparse_anno** to your command.
+
+> Sparse annotations means many positive samples are missed in your coordinate files. Training on such datasets is also known as "positive unlabeled learning". Addressing this option will activate a positive unlabeled method in EPicker.
+
+### Continual training
+
+<div id="continual_training"></div>
 
 ## Supplementary
 
 ### THI file
 
-<div id="thi"></thi>
+<div id="thi"></div>
