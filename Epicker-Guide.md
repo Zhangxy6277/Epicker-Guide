@@ -198,37 +198,37 @@ Before training on a new dataset, EPicker will first extract a small set of part
 
 THI file is broadly used in EPicker workflow. All THI files are in a general format like this:
 >[Header]
-content
-[End]
+>content
+>[End]
 
 The header declares what kind of content is stored in a THI file. Each line should be a particle coordinate, a path to an mrc file or an endpoint of a piece of filament. Examples of all types of THI file are shown below.
 
 **THI file of particles.** X, Y and Value stand for center coordinates and confidence(score of the particle).
 
 >[Particle Coordinates: X Y Value]
-1243 512 0.43
-123 5123 0.39
-[End]
+>1243 512 0.43
+>123 5123 0.39
+>[End]
 
 **THI file of vesicles.** Radius stands for the radius of a vesicle. Multiply Radius and pixelsize, and you will get the physical size of a vesicle.
 
 >[Vesicle Coordinates: X Y Radius Value]
-4313 1523 30 0.32
-3323 4152 60 0.28
-[End]
+>4313 1523 30 0.32
+>3323 4152 60 0.28
+>[End]
 
 **THI file of filaments.** X Y stands for center coordinates of endpoints. Endpoints with same Group belongs to one filament.
 
 >[Helix Coordinates: X Y Group Value]
-123 456 1 0.54
-156 499 1 0.49
-2231 2210 2 0.47
-2456 1982 2 0.46
-[End]
+>123 456 1 0.54
+>156 499 1 0.49
+>2231 2210 2 0.47
+>2456 1982 2 0.46
+>[End]
 
 **THI file of image list.** You can specify which mrc files to use without creating a new folder and copy them to it.
 
 >[File List: Filename]
-/Data/stack_0001_DW.mrc
-/Data/Stack_0002_DW.mrc
-[End]
+>/Data/stack_0001_DW.mrc
+>/Data/Stack_0002_DW.mrc
+>[End]
