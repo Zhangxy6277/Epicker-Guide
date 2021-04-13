@@ -68,7 +68,7 @@ For both ways of installation, the only thing you need to do is to run a linux s
 
 >$./EPicker-cu110.sh  
 
-If your default g++ version is below 5.0, you can simply specify a g++ path for compiling.
+You can specify which g++ to use. If not specified, default g++ in your environment will be used.
 >$./EPicker-cu110.sh {Path to g++}
 
 ## Picking
@@ -178,8 +178,57 @@ These parameters allow you to adjust your training procedure. Usually, you don't
 
 <div id="continual_training"></div>
 
+Before training on a new dataset, EPicker will first extract a small set of particles from old datasets and make an exemplar dataset. Constrained by extra terms of loss function, the new model should perform well both on the new dataset and this exemplar dataset. Following parameters are used for loading an exemplar dataset.
+
+- **sampling_size**
+
+- **load_exemplar**
+
+- **continual**
+
+- **output_exemplar**
+
+>To be complemented, By Tianfang, 2021-04-13-17:28
+
 ## Supplementary
 
 ### THI file
 
 <div id="thi"></div>
+
+THI file is broadly used in EPicker workflow. All THI files are in a general format like this:
+>[Header]
+content
+[End]
+
+The header declares what kind of content is stored in a THI file. Each line should be a particle coordinate, a path to an mrc file or an endpoint of a piece of filament. Examples of all types of THI file are shown below.
+
+**THI file of particles.** X, Y and Value stand for center coordinates and confidence(score of the particle).
+
+>[Particle Coordinates: X Y Value]
+1243 512 0.43
+123 5123 0.39
+[End]
+
+**THI file of vesicles.** Radius stands for the radius of a vesicle. Multiply Radius and pixelsize, and you will get the physical size of a vesicle.
+
+>[Vesicle Coordinates: X Y Radius Value]
+4313 1523 30 0.32
+3323 4152 60 0.28
+[End]
+
+**THI file of filaments.** X Y stands for center coordinates of endpoints. Endpoints with same Group belongs to one filament.
+
+>[Helix Coordinates: X Y Group Value]
+123 456 1 0.54
+156 499 1 0.49
+2231 2210 2 0.47
+2456 1982 2 0.46
+[End]
+
+**THI file of image list.** You can specify which mrc files to use without creating a new folder and copy them to it.
+
+>[File List: Filename]
+/Data/stack_0001_DW.mrc
+/Data/Stack_0002_DW.mrc
+[End]
