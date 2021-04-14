@@ -180,15 +180,11 @@ These parameters allow you to adjust your training procedure. Usually, you don't
 
 <div id="continual_training"></div>
 
-<<<<<<< HEAD
 ### Continual training
 
-Before training on a new dataset, EPicker will first extract a small set of particles from old datasets and make an exemplar dataset. Constrained by extra terms of loss function, the new model should perform well both on the new dataset and this exemplar dataset. Following parameters are used for loading an exemplar dataset.
-=======
 Continual training process of EPicker enables incrementally adding new features to the old model. Constrained by the exemplar dataset and extra terms of loss function, the new model performs well both on the new dataset and the old datasets. After training on a new dataset, EPicker will extract a small set of particles from the new dataset and update the old exemplar dataset. Following parameters are essential for continual training.
 
 - **load_model** Path to old model.
->>>>>>> 0ffdcc799ffed5d7c28caf519dfd97cff862afbe
 
 - **sampling_size** (default=200) Number of sample particles selected from the training dataset to construct an exemplar.
 
