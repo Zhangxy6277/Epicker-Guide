@@ -7,7 +7,7 @@
 
 ### What is EPicker
 
-EPicker is a standalone software for particle picking in cryo-EM. It is implemented based on CenterNet, an open-source deep learning detection framework. Trained and well tested on datasets containing heterogenous particles, EPicker is able to pick particles, vesicles and filaments effectively. Different from other particle picking tools, EPicker builds up a continual learning mechanism. A previously unseen type of particles can be well learnt after trained with a small dataset of old particles, yielding a new model able to recognize both new particles and old ones. With this advantage, you can continually upgrade your model and save a lot of storage for model saving and data saving used for traditional retraining procedures.
+EPicker is a standalone software for particle picking in cryo-EM. It is implemented based on CenterNet, an open-source deep learning detection framework. Trained and well tested on datasets containing heterogenous particles, EPicker is able to pick particles, vesicles and fibers effectively. Different from other particle picking tools, EPicker builds up a continual learning mechanism. With the introduction of an exemplar generated from old datasets, EPicker accumulates knowledge during the continual training process and avoids catastrophic forgetting, yielding a new model able to recognize both new particles and old ones. With this advantage, you can continually upgrade your model and save a lot of storage for model saving and data saving used for traditional retraining procedures.
 
 ### About this guide
 
@@ -105,10 +105,14 @@ These parameters are also useful and may influence your final picking results. Y
   
 >Usually those particles lying at the edge cannot be use for reconstruction, and this parameter help with ignoring those marginal particles. Notice that this value refers to a distance on a downsampled micrograph whose width(x-axis) has been downscaled to 1024.
 
-- **min_distance** (default=0) Minimum difference between two particles.
+- **min_distance** (default=0) Minimum distance between two particles.
 
 >In most cases, you do not need to set this value. If you find multiple boxes are addressed to only one particle, you may use a bigger min_distance.
-  
+
+- **ang_thresh** (default=0.3) Maximum curvature of tracing fiber. 
+
+>If you are picking particles and vesicles, you do not need to set this value. If you are picking and tracing fibers, you can change this parameter from 0.0 to 1.57 rad to get the best tracing results.
+
 - **visual** EPicker will visualize its picking results and save them in PNG format to your disk if you add **--visual** to your command.
   
 - **output_type** (default=thi) Which format of coordinate file you want to save. By now, for liposomes and filaments, we only support THI format. For single-particle jobs, you can switch to star, box, coord at your convinience.
@@ -150,11 +154,11 @@ These parameters allow you to adjust your training procedure. Usually, you don't
 
 > If you are training a model from scratch, just ignore this parameter. If you're finetuning a model or training in a continual manner, it helps you initialize your new model using old weights.
 
--**lr** (default=1e-4) Learning rate, the stepsize of gradient descent.
+- **lr** (default=1e-4) Learning rate, the stepsize of gradient descent.
 
 > Empirically, you dont't need to change it.
 
--**batch_size** (default=4) Batchsize, number of images in a mini-batch.
+- **batch_size** (default=4) Batchsize, number of images in a mini-batch.
 
 > Batchsize should not exceed your GPU memory. For example, if you're using a Tesla P100, you can set **batch_size=4**. If you have 4 Tesla P100 GPUs, set **batch_size=16**.
 
@@ -176,19 +180,25 @@ These parameters allow you to adjust your training procedure. Usually, you don't
 
 <div id="continual_training"></div>
 
+<<<<<<< HEAD
 ### Continual training
 
 Before training on a new dataset, EPicker will first extract a small set of particles from old datasets and make an exemplar dataset. Constrained by extra terms of loss function, the new model should perform well both on the new dataset and this exemplar dataset. Following parameters are used for loading an exemplar dataset.
+=======
+Continual training process of EPicker enables incrementally adding new features to the old model. Constrained by the exemplar dataset and extra terms of loss function, the new model performs well both on the new dataset and the old datasets. After training on a new dataset, EPicker will extract a small set of particles from the new dataset and update the old exemplar dataset. Following parameters are essential for continual training.
 
-- **sampling_size**
+- **load_model** Path to old model.
+>>>>>>> 0ffdcc799ffed5d7c28caf519dfd97cff862afbe
 
-- **load_exemplar**
+- **sampling_size** (default=200) Number of sample particles selected from the training dataset to construct an exemplar.
 
-- **continual**
+- **load_exemplar** Path to the old exemplar dataset.
 
-- **output_exemplar**
+- **output_exemplar** Path to save the new exemplar dataset.
 
->To be complemented, By Tianfang, 2021-04-13-17:28
+> After each continual training process, EPicker outputs a new exemplar dataset updated on the current training dataset.
+
+- **continual** If you are training in a continual manner, add **--continual** to your command.
 
 ## Supplementary
 
@@ -225,7 +235,7 @@ The header declares what kind of content is stored in a THI file. Each line shou
 >
 >[End]
 
-**THI file of filaments.** X Y stands for center coordinates of endpoints. Endpoints with same Group belongs to one filament.
+**THI file of fibers.** X Y stands for center coordinates of endpoints. Endpoints with same Group belongs to one fiber.
 
 >[Helix Coordinates: X Y Group Value]
 >
