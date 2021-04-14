@@ -28,7 +28,7 @@ A GPU is essential to run a deep learning program. We have tested EPicker on fol
 
 #### System
 
-EPicker is able to run on following systems
+We have tested EPicker on following systems.
 
 - CentOS 7
 - Ubuntu 18.04
@@ -38,13 +38,13 @@ A version for Windows is not available, but it's coming soon.
 
 #### GCC and CUDA
 
-The deep learning programming framework we use is pytorch. And because pytorch does not have a version that is compatible all CUDA versions, we provide installation packages for different environments. For an old version EPicker, CUDA9.0 and G++ 4.8.5 are enough to conduct installation. For higher versions, G++>=5.0 and CUDA10+ are needed.
+We use pytorch as our deep learning framework. And because pytorch does not have a version that is compatible with all CUDA versions, we provide installation packages for different environments. For an old version EPicker, CUDA9.0 and G++ 4.8.5 are enough to conduct installation. For higher versions, G++>=5.0 and CUDA10+ are needed.
 
 #### Network
 
 Considering some GPU nodes may not have access to Internet, we additionally provide offline packages. All third party dependencies are included in this installation script. You only need to download an appropriate package and simply run it in your terminal.
 
-Certainly, if your machine is Internet-available, you also need to download an installation script. But third party dependencies will be downloaded through the installer according to your local envrionment.
+Certainly, if your machine is Internet-available, you also need to download an installation script. But third party dependencies will be downloaded automatically through the installer according to your local envrionment.
 
 ### Download
 
@@ -174,9 +174,9 @@ These parameters allow you to adjust your training procedure. Usually, you don't
 
 > Sparse annotations means many positive samples are missed in your coordinate files. Training on such datasets is also known as "positive unlabeled learning". Addressing this option will activate a positive unlabeled method in EPicker.
 
-### Continual training
-
 <div id="continual_training"></div>
+
+### Continual training
 
 Before training on a new dataset, EPicker will first extract a small set of particles from old datasets and make an exemplar dataset. Constrained by extra terms of loss function, the new model should perform well both on the new dataset and this exemplar dataset. Following parameters are used for loading an exemplar dataset.
 
@@ -192,18 +192,18 @@ Before training on a new dataset, EPicker will first extract a small set of part
 
 ## Supplementary
 
-### THI file
-
 <div id="thi"></div>
 
-THI file is broadly used in EPicker workflow. All THI files are in a general format like this:
+### THI file
+
+THI files are broadly used in EPicker workflow. All THI files are in a general format like this:
 >[Header]
 >
 >content
 >
 >[End]
 
-The header declares what kind of content is stored in a THI file. Each line should be a particle coordinate, a path to an mrc file or an endpoint of a piece of filament. Examples of all types of THI file are shown below.
+The header declares what kind of content is stored in a THI file. Each line should be a coordinate of a particle, a path to an mrc file or an endpoint of a piece of filament. Examples of all types of THI file are shown below.
 
 **THI file of particles.** X, Y and Value stand for center coordinates and confidence(score of the particle).
 
